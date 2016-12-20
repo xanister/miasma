@@ -1,0 +1,15 @@
+{
+  "name": "miasma",
+  "version": "1.0.0",
+  "description": "game",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Nicholas Frees",
+  "license": "ISC",
+  "dependencies": {
+    "ts-loader": "^1.3.3",
+    "typescript": "^2.1.4",
+    "webpack": "^1.14.0"
+  }
+}
