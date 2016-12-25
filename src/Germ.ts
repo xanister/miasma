@@ -1,78 +1,53 @@
 import { Dish } from "./Dish";
 
-export interface IGermLimits {
-    radius: {
-        min: number;
-        max: number;
-    }
-    xSpeed: {
-        min: number;
-        max: number;
-    }
-    ySpeed: {
-        min: number;
-        max: number;
-    }
-}
-
-export const defaultGermLimits: IGermLimits = {
-    radius: {
-        min: 5,
-        max: 128
-    },
-    xSpeed: {
-        min: 1,
-        max: 10
-    },
-    ySpeed: {
-        min: 1,
-        max: 10
-    }
-}
-
-export interface IGermOptions {
-    dish: Dish;
-    limits?: IGermLimits;
-}
-
 export class Germ {
-    readonly options: IGermOptions;
-
-    color: string = "green";
+    color: string;
     radius: number;
     x: number;
     xSpeed: number;
     y: number;
     ySpeed: number;
-    z: number = 0;
+    z: number;
+
+    constructor() {
+        this.reset();
+    }
 
     get bottom(): number {
         return this.y + this.radius;
+    }
+
+    set bottom(v: number) {
+        this.y = v - this.radius;
     }
 
     get left(): number {
         return this.x - this.radius;
     }
 
+    set left(v: number) {
+        this.x = v + this.radius;
+    }
+
     get right(): number {
         return this.x + this.radius;
+    }
+
+    set right(v: number) {
+        this.x = v - this.radius;
     }
 
     get top(): number {
         return this.y - this.radius;
     }
 
-    constructor(options: IGermOptions) {
-        this.options = options;
-
-        this.options.limits = this.options.limits || defaultGermLimits;
-
-        this.reset();
+    set top(v: number) {
+        this.y = v + this.radius;
     }
 
     collides(germ: Germ): boolean {
-        return this !== germ && 
-            this.z === germ.z && 
+        return this !== germ &&
+            this.z === germ.z &&
             this.distanceToPoint(germ.x, germ.y) < (this.radius + germ.radius);
     }
 
@@ -80,57 +55,53 @@ export class Germ {
         return Math.sqrt(Math.pow(this.x - x, 2) + Math.pow(this.y - y, 2));
     }
 
-    handleCollisions(): void {
-        this.options.dish.germs.forEach(g => {
-            if (this.collides(g)) {
-                if (this.radius >= g.radius) {
-                    // TODO: Increment
-                    this.radius += (g.radius / 2);
-                    if (this.radius > this.options.limits.radius.max)
-                        this.radius = this.options.limits.radius.max;
-                    g.radius /= 2;
-                }
-            }
-        })
-    }
+    render(context: CanvasRenderingContext2D, scale: number = 1, opacity: number = 1): void {
+        if (this.radius <= 0 ||
+            this.right < 0 || 
+            this.top > window.innerHeight || 
+            this.left > window.innerWidth || 
+            this.bottom < 0) 
+            return;
 
-    render(context: CanvasRenderingContext2D): void {
+        context.globalAlpha = opacity;
         context.beginPath();
-        context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
+        context.arc(this.x * scale, this.y * scale, this.radius * scale, 0, 2 * Math.PI, false);
         context.fillStyle = this.color;
         context.fill();
-        context.lineWidth = 5;
+        context.lineWidth = 5 * scale;
         context.strokeStyle = '#003300';
         context.stroke();
+        context.globalAlpha = 1;
     }
 
-    reset(): void {
-        this.radius = Math.random() * this.options.limits.radius.max;
-        this.xSpeed = -Math.random() * this.options.limits.xSpeed.max;
-        this.ySpeed = Math.random() * (this.options.limits.ySpeed.max * 2) - this.options.limits.ySpeed.max;
+    reset() {
+        this.z = this.z || (50 + (Math.floor(Math.random() * 40) - 20));
+        if (this.radius && this.radius < 10) this.z--;
+        if (this.radius && this.radius > 256) this.z++;
+        if (this.z <= 0 || this.z >= 100) this.z = 50;
 
-        this.warp( 
-            (Math.random() * this.options.dish.width  * 2) + this.options.dish.width, 
-            (Math.random() * this.options.dish.height * 3) - this.options.dish.height
+        this.radius = 32 + (Math.random() * 32);
+        this.color = "green";
+        
+        this.xSpeed = -(Math.random() * 5);
+        this.ySpeed = (Math.random() * 10) - 5;
+
+        this.warp(
+            window.innerWidth + (Math.random() * window.innerWidth * 2),
+            (Math.random() * window.innerHeight * 3) - window.innerHeight
         );
     }
 
-    run(): void {
-        this.updatePosition();
-        this.handleCollisions();
-
-        if (this.right < 0) this.reset();
-        if (this.radius < this.options.limits.radius.min) this.reset();
-    }
-
-    updatePosition(): void {
+    run(dish: Dish) {
         this.x += this.xSpeed;
         this.y += this.ySpeed;
+
+        if (this.right < 0 || this.radius > (window.innerWidth / 2)) this.reset();
     }
 
     warp(x: number, y: number, z?: number): void {
         this.x = x;
         this.y = y;
-        this.z = z !== undefined ? z : this.z;
+        this.z = z || this.z || 50;
     }
 }

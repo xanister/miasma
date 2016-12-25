@@ -2,17 +2,22 @@ import { Dish } from "./Dish";
 import { Player } from "./Player";
 import { Replicator } from "./Replicator";
 
-let dish = new Dish(),
-    player = new Player({ dish: dish });
+let player = new Player(),
+    dish = new Dish({
+        color: "blue",
+        elementSelector: "body",
+        layers: 100,
+        player: player
+    });
 
-dish.germs = Replicator.generateGerms(500, { dish: dish });
-dish.germs.push(player);
+Replicator.generateGerms(1500).forEach(g => dish.append(g));
+
+(window as any).dish = dish;
 
 let run = () => {
     dish.run();
-    dish.render();    
 
     requestAnimationFrame(run);
 }
 
-run();
+requestAnimationFrame(run);
