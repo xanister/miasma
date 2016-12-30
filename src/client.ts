@@ -9,14 +9,14 @@ let conf = {
         minRadius: 10,
         maxRadius: window.innerHeight / 2,
         maxSpeed: 16,
-        spawnX: window.innerWidth * 2,
+        spawnX: window.innerWidth * 3,
         spawnY: window.innerHeight
     },
     playerOptions: {
         maxLayer: 4,
         minRadius: 10,
         maxRadius: window.innerHeight / 4,
-        maxSpeed: 6,
+        maxSpeed: 12,
         spawnX: 100,
         spawnY: window.innerHeight / 2
     }
@@ -34,9 +34,9 @@ Replicator
     .generateGerms(750, conf.germOptions)
     .forEach(g => dish.append(g));
 
-// let tick = 0;
+let tick = 0;
 let run = () => {
-    // if (tick++ % 2) 
+    // if (tick++ % 2) dish.run();
     dish.run();
 
     requestAnimationFrame(run);

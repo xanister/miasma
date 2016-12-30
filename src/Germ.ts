@@ -69,6 +69,7 @@ export class Germ {
     }
 
     render(context: CanvasRenderingContext2D, scale: number = 1, opacity: number = 1): void {
+        // TODO: MOVE TO OPTIONS
         if (this.radius * scale < 5 || this.x * scale + (this.radius * scale) < 0.1)
             return;
 
@@ -77,21 +78,22 @@ export class Germ {
         context.arc(this.x * scale, this.y * scale, this.radius * scale, 0, 2 * Math.PI, false);
         context.fillStyle = this.color;
         context.fill();
-        context.lineWidth = 5 * scale;
-        context.strokeStyle = '#003300';
+        context.lineWidth = 5 * scale; // TODO: MOVE TO OPTIONS
+        context.strokeStyle = '#003300'; // TODO: MOVE TO OPTIONS
         context.stroke();
         context.globalAlpha = 1;
     }
 
     reset() {
+        // TODO: MOVE TO OPTIONS
         this.z = this.z ||
             (Math.floor(Math.random() * this.options.maxLayer * 0.2) + Math.floor(this.options.maxLayer * 0.2));
-        if (this.radius && this.radius < 10) this.z--;
+        if (this.radius && this.radius < this.options.minRadius) this.z--;
         if (this.radius && this.radius > this.options.maxRadius) this.z++;
         if (this.z <= 0 || this.z >= this.options.maxLayer) this.z = this.options.maxLayer / 2;
 
-        this.radius = 32 + (Math.random() * 32);
-        this.color = "green";
+        this.radius = (Math.random() * (this.options.maxRadius - this.options.minRadius)) + this.options.minRadius;
+        this.color = "green"; // TODO: MOVE TO OPTIONS
 
         this.xSpeed = -(Math.random() * this.options.maxSpeed);
         this.ySpeed = (Math.random() * this.options.maxSpeed * 2) - this.options.maxSpeed;

@@ -1,7 +1,7 @@
 import { Dish } from "./Dish";
 import { Germ, IGermOptions } from "./Germ";
 
-export interface IPlayerOptions extends IGermOptions {}
+export interface IPlayerOptions extends IGermOptions { }
 
 export class Player extends Germ {
     constructor(options: IPlayerOptions) {
@@ -10,18 +10,18 @@ export class Player extends Germ {
 
     reset() {
         this.z = this.z || this.options.maxLayer / 2;
-        if (this.radius && this.radius < 10 && this.z > 0) this.z--;
-        if (this.radius && this.radius > (window.innerHeight / 4) && this.z < this.options.maxLayer) this.z++;
-        
-        this.color = "red";
-        this.radius = 64;
-        
-        this.warp( this.options.spawnX, this.options.spawnY );
+        if (this.radius && this.radius < this.options.minRadius && this.z > 0) this.z--;
+        if (this.radius && this.radius > this.options.maxRadius && this.z < this.options.maxLayer) this.z++;
+
+        this.color = "red"; // TODO: MOVE TO OPTIONS
+        this.radius = this.options.minRadius + Math.floor((this.options.maxRadius - this.options.minRadius) / 2);
+
+        this.warp(this.options.spawnX, this.options.spawnY);
     }
 
     run(dish: Dish) {
-        if (this.radius < 10) this.reset();
-        if (this.radius > (window.innerHeight / 4)) this.reset();
+        if (this.radius < this.options.minRadius) this.reset();
+        if (this.radius > this.options.maxRadius) this.reset();
 
         if (dish.isKeydown(["w"])) this.y -= this.options.maxSpeed;
         if (dish.isKeydown(["a"])) this.x -= this.options.maxSpeed;
