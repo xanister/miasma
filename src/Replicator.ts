@@ -1,15 +1,15 @@
-import { Germ } from "./Germ";
+import { Germ, IGermOptions } from "./Germ";
 
 export const Replicator = {
-    generateGerm(): Germ {
-        let g = new Germ();
+    generateGerm(options: IGermOptions): Germ {
+        let g = new Germ(options);
         g.reset();
         return g;
     },
-    generateGerms(count: number): Germ[] {
+    generateGerms(count: number, options: IGermOptions): Germ[] {
         let germs = [];
         for (let i = 0; i< count; i++) 
-            germs.push(Replicator.generateGerm());
+            germs.push(Replicator.generateGerm(options));
         return germs;
     }
 };

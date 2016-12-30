@@ -2,15 +2,19 @@ import { Dish } from "./Dish";
 import { Player } from "./Player";
 import { Replicator } from "./Replicator";
 
-let player = new Player(),
+let conf = {
+    layers: 20
+};
+
+let player = new Player({ maxLayer: conf.layers }),
     dish = new Dish({
         color: "blue",
         elementSelector: "body",
-        layers: 100,
+        layers: conf.layers,
         player: player
     });
 
-Replicator.generateGerms(1500).forEach(g => dish.append(g));
+Replicator.generateGerms(1500, { maxLayer: conf.layers }).forEach(g => dish.append(g));
 
 (window as any).dish = dish;
 

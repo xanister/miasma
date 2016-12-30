@@ -3,7 +3,7 @@ import { Germ } from "./Germ";
 
 export class Player extends Germ {
     reset() {
-        this.z = this.z || 50;
+        this.z = this.z || this.options.maxLayer / 2;
         if (this.radius && this.radius < 10 && this.z > 0) this.z--;
         if (this.radius && this.radius > 256 && this.z < 100) this.z++;
         

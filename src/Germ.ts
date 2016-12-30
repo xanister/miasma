@@ -1,6 +1,12 @@
 import { Dish } from "./Dish";
 
+export interface IGermOptions {
+    maxLayer: number;
+}
+
 export class Germ {
+    readonly options: IGermOptions;
+
     color: string;
     radius: number;
     x: number;
@@ -9,7 +15,9 @@ export class Germ {
     ySpeed: number;
     z: number;
 
-    constructor() {
+    constructor(options: IGermOptions) {
+        this.options = options;
+
         this.reset();
     }
 
@@ -57,10 +65,10 @@ export class Germ {
 
     render(context: CanvasRenderingContext2D, scale: number = 1, opacity: number = 1): void {
         if (this.radius <= 0 ||
-            this.right < 0 || 
-            this.top > window.innerHeight || 
-            this.left > window.innerWidth || 
-            this.bottom < 0) 
+            this.right < 0 ||
+            this.top > window.innerHeight ||
+            this.left > window.innerWidth ||
+            this.bottom < 0)
             return;
 
         context.globalAlpha = opacity;
@@ -75,14 +83,15 @@ export class Germ {
     }
 
     reset() {
-        this.z = this.z || (50 + (Math.floor(Math.random() * 40) - 20));
+        this.z = this.z ||
+            (Math.floor(Math.random() * this.options.maxLayer * 0.2) + Math.floor(this.options.maxLayer * 0.2));
         if (this.radius && this.radius < 10) this.z--;
         if (this.radius && this.radius > 256) this.z++;
-        if (this.z <= 0 || this.z >= 100) this.z = 50;
+        if (this.z <= 0 || this.z >= this.options.maxLayer) this.z = this.options.maxLayer / 2;
 
         this.radius = 32 + (Math.random() * 32);
         this.color = "green";
-        
+
         this.xSpeed = -(Math.random() * 5);
         this.ySpeed = (Math.random() * 10) - 5;
 
@@ -102,6 +111,6 @@ export class Germ {
     warp(x: number, y: number, z?: number): void {
         this.x = x;
         this.y = y;
-        this.z = z || this.z || 50;
+        this.z = z || this.z || Math.floor(this.options.maxLayer / 2);
     }
 }

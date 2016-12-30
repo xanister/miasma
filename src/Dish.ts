@@ -63,6 +63,7 @@ export class Dish {
     get width() { return this.canvas.clientWidth; }
 
     append(germ: Germ): void {
+        console.log(germ.z);
         this.germs[germ.z].push(germ);
     }
 
@@ -83,10 +84,12 @@ export class Dish {
         }
     }
 
-    isKeydown(keycode: number | number[]): boolean {
-        return typeof keycode === "number" ?
-            !!this.keyboard[keycode] :
-            keycode.some(c => this.keyboard[c]);
+    isKeydown(key: number | number[] | string): boolean {
+        switch(typeof key) {
+            case "number": return !!this.keyboard[key as number];
+            // case "string": return true;
+            default: return (key as number[]).some(c => this.keyboard[c]);
+        }   
     }
 
     run(): void {
