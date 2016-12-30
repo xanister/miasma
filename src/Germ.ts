@@ -2,6 +2,11 @@ import { Dish } from "./Dish";
 
 export interface IGermOptions {
     maxLayer: number;
+    minRadius: number;
+    maxRadius: number;
+    maxSpeed: number;
+    spawnX: number;
+    spawnY: number;
 }
 
 export class Germ {
@@ -64,11 +69,7 @@ export class Germ {
     }
 
     render(context: CanvasRenderingContext2D, scale: number = 1, opacity: number = 1): void {
-        if (this.radius <= 0 ||
-            this.right < 0 ||
-            this.top > window.innerHeight ||
-            this.left > window.innerWidth ||
-            this.bottom < 0)
+        if (this.radius * scale < 5 || this.x * scale + (this.radius * scale) < 0.1)
             return;
 
         context.globalAlpha = opacity;
@@ -86,18 +87,18 @@ export class Germ {
         this.z = this.z ||
             (Math.floor(Math.random() * this.options.maxLayer * 0.2) + Math.floor(this.options.maxLayer * 0.2));
         if (this.radius && this.radius < 10) this.z--;
-        if (this.radius && this.radius > 256) this.z++;
+        if (this.radius && this.radius > this.options.maxRadius) this.z++;
         if (this.z <= 0 || this.z >= this.options.maxLayer) this.z = this.options.maxLayer / 2;
 
         this.radius = 32 + (Math.random() * 32);
         this.color = "green";
 
-        this.xSpeed = -(Math.random() * 5);
-        this.ySpeed = (Math.random() * 10) - 5;
+        this.xSpeed = -(Math.random() * this.options.maxSpeed);
+        this.ySpeed = (Math.random() * this.options.maxSpeed * 2) - this.options.maxSpeed;
 
         this.warp(
-            window.innerWidth + (Math.random() * window.innerWidth * 2),
-            (Math.random() * window.innerHeight * 3) - window.innerHeight
+            this.options.spawnX + Math.floor(Math.random() * this.options.spawnX), 
+            Math.floor(Math.random() * this.options.spawnY * 3) - this.options.spawnY
         );
     }
 
@@ -105,12 +106,12 @@ export class Germ {
         this.x += this.xSpeed;
         this.y += this.ySpeed;
 
-        if (this.right < 0 || this.radius > (window.innerWidth / 2)) this.reset();
+        if (this.right < 0 || this.radius > this.options.maxRadius) this.reset();
     }
 
     warp(x: number, y: number, z?: number): void {
         this.x = x;
         this.y = y;
-        this.z = z || this.z || Math.floor(this.options.maxLayer / 2);
+        this.z = z || this.z;
     }
 }

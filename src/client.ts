@@ -3,10 +3,26 @@ import { Player } from "./Player";
 import { Replicator } from "./Replicator";
 
 let conf = {
-    layers: 20
+    layers: 4,
+    germOptions: {
+        maxLayer: 4,
+        minRadius: 10,
+        maxRadius: window.innerHeight / 2,
+        maxSpeed: 16,
+        spawnX: window.innerWidth * 2,
+        spawnY: window.innerHeight
+    },
+    playerOptions: {
+        maxLayer: 4,
+        minRadius: 10,
+        maxRadius: window.innerHeight / 4,
+        maxSpeed: 6,
+        spawnX: 100,
+        spawnY: window.innerHeight / 2
+    }
 };
 
-let player = new Player({ maxLayer: conf.layers }),
+let player = new Player(conf.playerOptions),
     dish = new Dish({
         color: "blue",
         elementSelector: "body",
@@ -14,14 +30,15 @@ let player = new Player({ maxLayer: conf.layers }),
         player: player
     });
 
-Replicator.generateGerms(1500, { maxLayer: conf.layers }).forEach(g => dish.append(g));
+Replicator
+    .generateGerms(750, conf.germOptions)
+    .forEach(g => dish.append(g));
 
-(window as any).dish = dish;
-
+// let tick = 0;
 let run = () => {
+    // if (tick++ % 2) 
     dish.run();
 
     requestAnimationFrame(run);
 }
-
 requestAnimationFrame(run);

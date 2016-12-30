@@ -16,8 +16,9 @@ export class Dish {
 
     readonly options: IDishOptions;
 
-    keyboard: { [keyCode: number]: boolean } = {};
-
+    keyboard: { [key: string]: boolean } = {};
+    keyboardCodes: { [keyCode: number]: boolean } = {};
+    
     constructor(options: IDishOptions) {
         this.options = options;
 
@@ -38,11 +39,13 @@ export class Dish {
     }
 
     private handleKeydown(event: KeyboardEvent): void {
-        this.keyboard[event.keyCode] = true;
+        this.keyboard[event.key] = true;
+        this.keyboardCodes[event.keyCode] = true;
     }
 
     private handleKeyup(event: KeyboardEvent): void {
-        this.keyboard[event.keyCode] = false;
+        this.keyboard[event.key] = false;
+        this.keyboardCodes[event.keyCode] = false;
     }
 
     private handleResize(event?: Event): void {
@@ -63,7 +66,6 @@ export class Dish {
     get width() { return this.canvas.clientWidth; }
 
     append(germ: Germ): void {
-        console.log(germ.z);
         this.germs[germ.z].push(germ);
     }
 
@@ -73,6 +75,7 @@ export class Dish {
     }
 
     handleCollision(g1: Germ, g2: Germ): void {
+        // TODO: ADD TO OPTIONS
         if (g1.radius > g2.radius || (g1.radius === g2.radius && g1 === this.options.player)) {
             g1.radius += 1;
             g2.radius -= 1;
@@ -84,17 +87,19 @@ export class Dish {
         }
     }
 
-    isKeydown(key: number | number[] | string): boolean {
+    isKeydown(key: number | string | string[]): boolean {
         switch(typeof key) {
-            case "number": return !!this.keyboard[key as number];
-            // case "string": return true;
-            default: return (key as number[]).some(c => this.keyboard[c]);
+            case "number": return !!this.keyboardCodes[key as number];
+            case "string": return !!this.keyboard[key as string];
+            default: return (key as string[]).some(c => this.keyboard[c]);
         }   
     }
 
     run(): void {
+        // Clear the canvas
         this.clearCanvas();
 
+        // Update and render germs
         this.germs
             .forEach((layer, layerIndex) => layer.forEach(g => {
                 // Handle collisions
@@ -109,14 +114,15 @@ export class Dish {
                     this.append(g);
                 }
 
-                // Render the germ
+                // Render the germ, scale by z-distance
                 g.render(
                     this.canvasContext, 
-                    this.options.player.z / g.z, 
-                    g.z === this.options.player.z ? 1 : 0.2
+                    this.options.player.z / g.z,
+                    g.z === this.options.player.z ? 1 : 1 / Math.abs(this.options.player.z - g.z) * 0.2
                 );
             }));
 
+        // Render UI
         this.canvasContext.font = "20px Arial";
         this.canvasContext.fillText(`${this.options.player.z.toString()}`, 20, 20);            
     }
