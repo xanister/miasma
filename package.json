@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "game",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "webpack",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "webpack --watch"
   },
   "author": "Nicholas Frees",
   "license": "ISC",
