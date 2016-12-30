@@ -18,7 +18,7 @@ export class Dish {
 
     keyboard: { [key: string]: boolean } = {};
     keyboardCodes: { [keyCode: number]: boolean } = {};
-    
+
     constructor(options: IDishOptions) {
         this.options = options;
 
@@ -74,57 +74,89 @@ export class Dish {
         this.canvasContext.fillRect(0, 0, this.width, this.height);
     }
 
+    getGermScale(germ: Germ): number {
+        return (this.options.player.z + 1) / (germ.z + 1);
+    }
+
     handleCollision(g1: Germ, g2: Germ): void {
         // TODO: ADD TO OPTIONS
         if (g1.radius > g2.radius || (g1.radius === g2.radius && g1 === this.options.player)) {
             g1.radius += 1;
             g2.radius -= 1;
-            if (g2.radius <= 0) g2.reset();
+            if (g2.radius <= 0) g2.reset(this);
         } else {
             g1.radius -= 1;
             g2.radius += 1;
-            if (g1.radius <= 0) g1.reset();
+            if (g1.radius <= 0) g1.reset(this);
         }
     }
 
+    isGermVisible(germ: Germ, scale: number): boolean {
+        return germ === this.options.player || (
+            (germ.x - germ.radius) * scale < this.width &&
+            (germ.x + germ.radius) * scale > 0 &&
+            (germ.y - germ.radius) * scale < this.height &&
+            (germ.y + germ.radius) * scale > 0);
+    }
+
     isKeydown(key: number | string | string[]): boolean {
-        switch(typeof key) {
+        // TODO: HANDLE STRING ARRAY
+        switch (typeof key) {
             case "number": return !!this.keyboardCodes[key as number];
             case "string": return !!this.keyboard[key as string];
             default: return (key as string[]).some(c => this.keyboard[c]);
-        }   
+        }
     }
 
-    run(): void {
+    shouldGermReset(germ: Germ, scale: number): boolean {
+        // TODO: VERIFY SCALING LOGIC
+        return germ.radius <= 0 ||                                              // Too small
+            germ.x + (germ.radius * scale) < 0 ||                               // Right edge left of screen
+            (germ.y + (germ.radius * scale) < 0 && germ.ySpeed <= 0) ||         // Bottom edge above top of screen and ySpeed < 0
+            (germ.y - (germ.radius * scale) > this.height && germ.ySpeed >= 0); // Top edge below bottom of screen and ySpeed > 0
+    }
+
+    run(renderOnly: boolean = false): void {
         // Clear the canvas
         this.clearCanvas();
 
         // Update and render germs
         this.germs
             .forEach((layer, layerIndex) => layer.forEach(g => {
-                // Handle collisions
-                layer.forEach(g2 => { if (g.collides(g2)) this.handleCollision(g, g2); });
+                // Scale by z-distance to player and don't render offscreen
+                const scale = this.getGermScale(g),
+                    visible = this.isGermVisible(g, scale);
 
-                // Run the germ
-                g.run(this);
+                // Skip logic when asked
+                if (!renderOnly) {
+                    // Update position
+                    g.x += g.xSpeed;
+                    g.y += g.ySpeed;
 
-                // Handle layer changes
-                if (g.z !== layerIndex) {
-                    layer.splice(layer.indexOf(g), 1);
-                    this.append(g);
+                    // Handle collisions
+                    layer.forEach(g2 => g.collides(g2) && this.handleCollision(g, g2));
+
+                    // Reset when offscreen
+                    if (this.shouldGermReset(g, scale)) g.reset(this, scale);
+
+                    // Handle layer changes
+                    if (g.z !== layerIndex) {
+                        layer.splice(layer.indexOf(g), 1);
+                        this.germs[g.z].push(g);
+                    }
+
+                    // Run the germ
+                    g.run(this);
                 }
 
-                // Render the germ, scale by z-distance
-                g.render(
-                    this.canvasContext, 
-                    this.options.player.z / g.z,
-                    g.z === this.options.player.z ? 1 : 1 / Math.abs(this.options.player.z - g.z) * 0.2
-                );
+                // Render the germ
+                if (visible) g.render(this.canvasContext, scale, scale === 1 ? 1 : scale * 0.2);
             }));
 
         // Render UI
         this.canvasContext.font = "20px Arial";
-        this.canvasContext.fillText(`${this.options.player.z.toString()}`, 20, 20);            
+        this.canvasContext.fillStyle = "red";
+        this.canvasContext.fillText(`${this.options.player.z.toString()}`, 20, 20);
     }
 
     size(): number {

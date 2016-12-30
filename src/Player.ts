@@ -6,22 +6,20 @@ export interface IPlayerOptions extends IGermOptions { }
 export class Player extends Germ {
     constructor(options: IPlayerOptions) {
         super(options);
+
+        this.z = 0;
     }
 
-    reset() {
-        this.z = this.z || this.options.maxLayer / 2;
-        if (this.radius && this.radius < this.options.minRadius && this.z > 0) this.z--;
-        if (this.radius && this.radius > this.options.maxRadius && this.z < this.options.maxLayer) this.z++;
-
-        this.color = "red"; // TODO: MOVE TO OPTIONS
-        this.radius = this.options.minRadius + Math.floor((this.options.maxRadius - this.options.minRadius) / 2);
-
-        this.warp(this.options.spawnX, this.options.spawnY);
+    reset(dish: Dish) {
+        if (this.radius < this.options.minRadius && this.z > 0) this.z--;
+        if (this.radius > this.options.maxRadius && this.z < this.options.maxLayer) this.z++;
+        this.radius = this.options.minRadius;
+        this.warp(this.radius + 1, dish.height / 2);
     }
 
     run(dish: Dish) {
-        if (this.radius < this.options.minRadius) this.reset();
-        if (this.radius > this.options.maxRadius) this.reset();
+        if (this.radius < this.options.minRadius ||
+            this.radius > this.options.maxRadius) this.reset(dish);
 
         if (dish.isKeydown(["w"])) this.y -= this.options.maxSpeed;
         if (dish.isKeydown(["a"])) this.x -= this.options.maxSpeed;

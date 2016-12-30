@@ -1,12 +1,11 @@
 import { Dish } from "./Dish";
 
 export interface IGermOptions {
+    defaultColor: string;
     maxLayer: number;
     minRadius: number;
     maxRadius: number;
     maxSpeed: number;
-    spawnX: number;
-    spawnY: number;
 }
 
 export class Germ {
@@ -23,7 +22,13 @@ export class Germ {
     constructor(options: IGermOptions) {
         this.options = options;
 
-        this.reset();
+        this.color = this.options.defaultColor;
+        this.radius = 0;
+        this.x = 0;
+        this.xSpeed = 0;
+        this.y = 0;
+        this.ySpeed = 0;
+        this.z = Math.floor(this.options.maxLayer / 2);
     }
 
     get bottom(): number {
@@ -70,7 +75,7 @@ export class Germ {
 
     render(context: CanvasRenderingContext2D, scale: number = 1, opacity: number = 1): void {
         // TODO: MOVE TO OPTIONS
-        if (this.radius * scale < 5 || this.x * scale + (this.radius * scale) < 0.1)
+        if (this.radius * scale < 5)
             return;
 
         context.globalAlpha = opacity;
@@ -84,36 +89,36 @@ export class Germ {
         context.globalAlpha = 1;
     }
 
-    reset() {
-        // TODO: MOVE TO OPTIONS
-        this.z = this.z ||
-            (Math.floor(Math.random() * this.options.maxLayer * 0.2) + Math.floor(this.options.maxLayer * 0.2));
-        if (this.radius && this.radius < this.options.minRadius) this.z--;
-        if (this.radius && this.radius > this.options.maxRadius) this.z++;
-        if (this.z <= 0 || this.z >= this.options.maxLayer) this.z = this.options.maxLayer / 2;
+    /**
+     * Randomize the germ's radiusm move it offscreen 
+     * and set its speed to intersect with the dish. 
+     * If too large or small update the layer as well
+     */
+    reset(dish: Dish, scale: number = 1) {
+        // Update the layer if too large or small, randomize 
+        // only if out of range
+        if (this.radius < this.options.minRadius) this.z--;
+        if (this.radius > this.options.maxRadius) this.z++;
+        this.z = this.z > this.options.maxLayer || this.z < 0 ? 
+            Math.floor(Math.random() * this.options.maxLayer) : 
+            this.z;
 
-        this.radius = (Math.random() * (this.options.maxRadius - this.options.minRadius)) + this.options.minRadius;
-        this.color = "green"; // TODO: MOVE TO OPTIONS
+        // Randomize radius
+        this.radius = this.options.minRadius + (Math.random() * (this.options.maxRadius - this.options.minRadius));
 
-        this.xSpeed = -(Math.random() * this.options.maxSpeed);
-        this.ySpeed = (Math.random() * this.options.maxSpeed * 2) - this.options.maxSpeed;
-
-        this.warp(
-            this.options.spawnX + Math.floor(Math.random() * this.options.spawnX), 
-            Math.floor(Math.random() * this.options.spawnY * 3) - this.options.spawnY
-        );
+        // Randomize location
+        // TODO: account correctly for scale when determining new location
+        this.x = (dish.width / scale) + this.radius + (Math.random() * dish.width); 
+        this.y = Math.round(Math.random() * dish.height * 3 / scale) - (dish.height / scale);
+        this.xSpeed = -Math.round(Math.random() * this.options.maxSpeed);
+        this.ySpeed = Math.floor(Math.random() * this.options.maxSpeed * 2) - this.options.maxSpeed;
     }
 
-    run(dish: Dish) {
-        this.x += this.xSpeed;
-        this.y += this.ySpeed;
-
-        if (this.right < 0 || this.radius > this.options.maxRadius) this.reset();
-    }
+    run(dish: Dish) { }
 
     warp(x: number, y: number, z?: number): void {
         this.x = x;
         this.y = y;
-        this.z = z || this.z;
+        this.z = z !== undefined ? z : this.z;
     }
 }
