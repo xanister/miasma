@@ -32,10 +32,14 @@ Replicator
     .generateGerms(5 * conf.layers, conf.germOptions)
     .forEach(g => dish.append(g));
 
-let tick = 0;
+// Prerun to randomize a bit
+for (let i = 0; i < 5000; i++) dish.run();
+
+// let tick = 0;
 let run = () => {
     // if (tick++ % 2) dish.run();
     dish.run();
+    dish.render();
 
     requestAnimationFrame(run);
 }

@@ -116,38 +116,16 @@ export class Dish {
             (germ.y - (germ.radius * scale) > this.height && germ.ySpeed >= 0); // Top edge below bottom of screen and ySpeed > 0
     }
 
-    run(renderOnly: boolean = false): void {
+    render(): void {
         // Clear the canvas
         this.clearCanvas();
 
-        // Update and render germs
+        // Render germs
         this.germs
             .forEach((layer, layerIndex) => layer.forEach(g => {
                 // Scale by z-distance to player and don't render offscreen
                 const scale = this.getGermScale(g),
                     visible = this.isGermVisible(g, scale);
-
-                // Skip logic when asked
-                if (!renderOnly) {
-                    // Update position
-                    g.x += g.xSpeed;
-                    g.y += g.ySpeed;
-
-                    // Handle collisions
-                    layer.forEach(g2 => g.collides(g2) && this.handleCollision(g, g2));
-
-                    // Reset when offscreen
-                    if (this.shouldGermReset(g, scale)) g.reset(this, scale);
-
-                    // Handle layer changes
-                    if (g.z !== layerIndex) {
-                        layer.splice(layer.indexOf(g), 1);
-                        this.germs[g.z].push(g);
-                    }
-
-                    // Run the germ
-                    g.run(this);
-                }
 
                 // Render the germ
                 if (visible) g.render(this.canvasContext, scale, scale === 1 ? 1 : scale * 0.2);
@@ -157,6 +135,34 @@ export class Dish {
         this.canvasContext.font = "20px Arial";
         this.canvasContext.fillStyle = "red";
         this.canvasContext.fillText(`${this.options.player.z.toString()}`, 20, 20);
+    }
+
+    run(): void {
+        // Update germs
+        this.germs
+            .forEach((layer, layerIndex) => layer.forEach(g => {
+                // Scale by z-distance
+                const scale = this.getGermScale(g);
+
+                // Update position
+                g.x += g.xSpeed;
+                g.y += g.ySpeed;
+
+                // Handle collisions
+                layer.forEach(g2 => g.collides(g2) && this.handleCollision(g, g2));
+
+                // Reset when offscreen
+                if (this.shouldGermReset(g, scale)) g.reset(this, scale);
+
+                // Handle layer changes
+                if (g.z !== layerIndex) {
+                    layer.splice(layer.indexOf(g), 1);
+                    this.germs[g.z].push(g);
+                }
+
+                // Run the germ
+                g.run(this);
+            }));
     }
 
     size(): number {
