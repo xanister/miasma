@@ -4,7 +4,7 @@ import { Replicator } from "./Replicator";
 
 let conf = {
     germsPerLayer: 15,
-    layers: 19
+    layers: 6
 }, germOptions = {
     defaultColor: "yellow",
     maxLayer: conf.layers - 1,
@@ -15,7 +15,7 @@ let conf = {
     defaultColor: "white",
     maxLayer: conf.layers - 1,
     minRadius: 40,
-    maxRadius: window.innerHeight / 4,
+    maxRadius: window.innerHeight / 8,
     maxSpeed: 12
 }, player = new Player(playerOptions),
     dish = new Dish({
