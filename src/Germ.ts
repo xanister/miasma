@@ -66,6 +66,8 @@ export class Germ {
     collides(germ: Germ): boolean {
         return this !== germ &&
             this.z === germ.z &&
+            this.radius <= this.options.maxRadius &&
+            germ.radius <= germ.options.maxRadius &&
             this.distanceToPoint(germ.x, germ.y) < (this.radius + germ.radius);
     }
 
@@ -90,7 +92,7 @@ export class Germ {
     }
 
     /**
-     * Randomize the germ's radiusm move it offscreen 
+     * Randomize the germ's radius, move it offscreen 
      * and set its speed to intersect with the dish. 
      * If too large or small update the layer as well
      */

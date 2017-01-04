@@ -108,14 +108,6 @@ export class Dish {
         }
     }
 
-    shouldGermReset(germ: Germ, scale: number): boolean {
-        // TODO: VERIFY SCALING LOGIC
-        return germ.radius <= 0 ||                                              // Too small
-            germ.x + (germ.radius * scale) < 0 ||                               // Right edge left of screen
-            (germ.y + (germ.radius * scale) < 0 && germ.ySpeed <= 0) ||         // Bottom edge above top of screen and ySpeed < 0
-            (germ.y - (germ.radius * scale) > this.height && germ.ySpeed >= 0); // Top edge below bottom of screen and ySpeed > 0
-    }
-
     render(): void {
         // Clear the canvas
         this.clearCanvas();
@@ -134,7 +126,7 @@ export class Dish {
         // Render UI
         this.canvasContext.font = "20px Arial";
         this.canvasContext.fillStyle = "red";
-        this.canvasContext.fillText(`${this.options.player.z.toString()}`, 20, 20);
+        this.canvasContext.fillText(`${this.options.player.z.toString()}`, 20, 40);
     }
 
     run(): void {
@@ -163,6 +155,14 @@ export class Dish {
                 // Run the germ
                 g.run(this);
             }));
+    }
+
+    shouldGermReset(germ: Germ, scale: number): boolean {
+        // TODO: VERIFY SCALING LOGIC
+        return germ.radius * scale <= 5 ||                                                  // Too small
+            (germ.x * scale) + (germ.radius * scale) < 0 ||                                 // Right edge left of screen
+            ((germ.y * scale) + (germ.radius * scale) < 0 && germ.ySpeed <= 0) ||           // Bottom edge above top of screen and ySpeed < 0
+            ((germ.y * scale) - (germ.radius * scale) > this.height && germ.ySpeed >= 0);   // Top edge below bottom of screen and ySpeed > 0
     }
 
     size(): number {

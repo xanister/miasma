@@ -7,7 +7,7 @@ export class Player extends Germ {
     constructor(options: IPlayerOptions) {
         super(options);
 
-        this.z = 0;
+        this.z = options.maxLayer / 2;
     }
 
     reset(dish: Dish) {
