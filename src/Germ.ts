@@ -28,7 +28,7 @@ export class Germ {
         this.xSpeed = 0;
         this.y = 0;
         this.ySpeed = 0;
-        this.z = Math.floor(this.options.maxLayer / 2);
+        this.z = Math.floor(Math.random() * this.options.maxLayer);
     }
 
     get bottom(): number {
@@ -66,8 +66,8 @@ export class Germ {
     collides(germ: Germ): boolean {
         return this !== germ &&
             this.z === germ.z &&
-            this.radius <= this.options.maxRadius &&
-            germ.radius <= germ.options.maxRadius &&
+            // this.radius <= this.options.maxRadius &&
+            // germ.radius <= germ.options.maxRadius &&
             this.distanceToPoint(germ.x, germ.y) < (this.radius + germ.radius);
     }
 
@@ -102,11 +102,11 @@ export class Germ {
         if (this.radius < this.options.minRadius) this.z--;
         if (this.radius > this.options.maxRadius) this.z++;
         this.z = this.z > this.options.maxLayer || this.z < 0 ? 
-            Math.floor(Math.random() * this.options.maxLayer) : 
+            this.options.maxLayer - 1 : // Math.floor(Math.random() * this.options.maxLayer) : 
             this.z;
 
         // Randomize radius
-        this.radius = this.options.minRadius + (Math.random() * (this.options.maxRadius - this.options.minRadius));
+        this.radius = this.options.minRadius + (Math.random() * (this.options.maxRadius - this.options.minRadius) * 0.5);
 
         // Randomize location
         // TODO: account correctly for scale when determining new location

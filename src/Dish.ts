@@ -84,11 +84,12 @@ export class Dish {
             g1.radius += 1;
             g2.radius -= 1;
             if (g2.radius <= 0) g2.reset(this);
-        } else {
-            g1.radius -= 1;
-            g2.radius += 1;
-            if (g1.radius <= 0) g1.reset(this);
         }
+        //  else {
+        //     g1.radius -= 1;
+        //     g2.radius += 1;
+        //     if (g1.radius <= 0) g1.reset(this);
+        // }
     }
 
     isGermVisible(germ: Germ, scale: number): boolean {
@@ -141,7 +142,8 @@ export class Dish {
                 g.y += g.ySpeed;
 
                 // Handle collisions
-                layer.forEach(g2 => g.collides(g2) && this.handleCollision(g, g2));
+                if (g.radius <= g.options.maxRadius)
+                    layer.forEach(g2 => g.collides(g2) && this.handleCollision(g, g2));
 
                 // Reset when offscreen
                 if (this.shouldGermReset(g, scale)) g.reset(this, scale);

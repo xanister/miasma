@@ -3,14 +3,14 @@ import { Player } from "./Player";
 import { Replicator } from "./Replicator";
 
 let conf = {
-    germsPerLayer: 5,
-    layers: 5
+    germsPerLayer: 15,
+    layers: 19
 }, germOptions = {
     defaultColor: "yellow",
     maxLayer: conf.layers - 1,
     minRadius: 5,
-    maxRadius: window.innerHeight,
-    maxSpeed: 16
+    maxRadius: window.innerHeight / 8,
+    maxSpeed: 6
 }, playerOptions = {
     defaultColor: "white",
     maxLayer: conf.layers - 1,
@@ -30,7 +30,7 @@ Replicator
     .forEach(g => dish.append(g));
 
 // Prerun to randomize a bit
-// for (let i = 0; i < 5000; i++) dish.run();
+// for (let i = 0; i < 15000; i++) dish.run();
 
 // let tick = 0;
 let run = () => {
