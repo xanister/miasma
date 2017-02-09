@@ -1,6 +1,6 @@
 # Miasma
 Simple canvas example
 ## Installation
-npm install
+`npm install`
 ## Usage
 `npm run build` to compile TypeScript
