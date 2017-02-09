@@ -1,4 +1,4 @@
-# ${1:Project Name}
+# Miasma
 Simple canvas example
 ## Installation
 npm install
