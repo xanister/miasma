@@ -8,7 +8,7 @@
     "watch": "webpack --watch"
   },
   "author": "Nicholas Frees",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "ts-loader": "^1.3.3",
     "typescript": "^2.1.4",
