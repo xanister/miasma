@@ -1,7 +1,7 @@
-module.exports = {  
+module.exports = {
   entry: './src/client.ts',
   output: {
-    filename: 'build/client.js'
+    filename: 'dist/client.js'
   },
   devtool: 'source-map',
   resolve: {
